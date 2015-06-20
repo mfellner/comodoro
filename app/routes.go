@@ -26,6 +26,12 @@ func routes(d *db.DB) Routes {
 			api.Index,
 		},
 		Route{
+			"CreateFleetUnit",
+			"POST",
+			"/api/fleet/units",
+			fleet.CreateUnit(d),
+		},
+		Route{
 			"GetFleetUnits",
 			"GET",
 			"/api/fleet/units",
