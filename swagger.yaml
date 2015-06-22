@@ -1,0 +1,36 @@
+swagger: '2.0'
+info:
+  title: Comodoro API
+  description: Command fleets of containers with the Comodoro API
+  version: "0.1.0"
+host: localhost:8000
+schemes:
+  - http
+basePath: /api
+produces:
+  - application/json
+paths:
+  /fleet/units:
+    get:
+      summary: Fleet units
+      description: |
+        A bunch of fleet units.
+      tags:
+        - fleet
+      responses:
+        200:
+          description: An array of fleet units
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Unit'
+
+definitions:
+  Unit:
+    properties:
+      name:
+        type: string
+        description: Fleet unit name.
+      body:
+        type: string
+        description: Fleet unit body.

@@ -15,9 +15,11 @@ func writeResponse(w http.ResponseWriter, i int, v interface{}) {
 }
 
 // Index writes a response for the root of the API.
-func Index(w http.ResponseWriter, r *http.Request) {
-	v := struct{}{}
-	JSON(w, v)
+func Index() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		v := struct{}{}
+		JSON(w, v)
+	})
 }
 
 // JSON writes a code 200 JSON content response.

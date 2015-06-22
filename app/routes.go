@@ -10,10 +10,10 @@ import (
 
 // Route represents a route for the HTTP handler.
 type Route struct {
-	Name        string
-	Method      string
-	Pattern     string
-	HandlerFunc http.HandlerFunc
+	Name    string
+	Method  string
+	Pattern string
+	Handler http.Handler
 }
 
 // Routes is a collection of routes.
@@ -25,7 +25,7 @@ func routes(d *db.DB) Routes {
 			"Index",
 			"GET",
 			"/",
-			api.Index,
+			api.Index(),
 		},
 		Route{
 			"CreateFleetUnit",

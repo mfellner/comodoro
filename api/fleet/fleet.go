@@ -16,8 +16,8 @@ import (
 var bucketName = []byte("units")
 
 // CreateUnit creates a new fleet unit.
-func CreateUnit(db *db.DB) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+func CreateUnit(db *db.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		var unit model.Unit
 		body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
@@ -48,12 +48,12 @@ func CreateUnit(db *db.DB) func(http.ResponseWriter, *http.Request) {
 			}
 			return err
 		})
-	}
+	})
 }
 
 // GetUnits returns a collection of all fleet units.
-func GetUnits(db *db.DB) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+func GetUnits(db *db.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		units := model.Units{}
 
@@ -67,12 +67,12 @@ func GetUnits(db *db.DB) func(http.ResponseWriter, *http.Request) {
 		})
 
 		api.JSON(w, units)
-	}
+	})
 }
 
 // GetUnit returns a single fleet unit for the given name.
-func GetUnit(db *db.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+func GetUnit(db *db.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
 		name := vars["name"]
@@ -88,5 +88,5 @@ func GetUnit(db *db.DB) func(w http.ResponseWriter, r *http.Request) {
 			}
 			return nil
 		})
-	}
+	})
 }

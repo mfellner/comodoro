@@ -27,7 +27,7 @@ func NewApp(d *db.DB) *App {
 			Methods(route.Method).
 			Path(route.Pattern).
 			Name(route.Name).
-			Handler(route.HandlerFunc)
+			Handler(AllowOrigin(route.Handler))
 	}
 
 	return app

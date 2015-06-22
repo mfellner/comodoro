@@ -12,13 +12,18 @@ import (
 var dbFile *string
 
 func init() {
+	port := flag.Int("port", 8080, "Port to listen on")
+	loglevel := flag.String("log", "info", "Loglevel (debug|info)")
+	dbFile = flag.String("db", "/tmp/comodoro.db", "Path to the BoltDB file")
+	flag.Parse()
+
 	viper.SetEnvPrefix("app")
 
 	viper.BindEnv("port")
 	viper.BindEnv("loglevel")
 
-	viper.SetDefault("port", 8080)
-	viper.SetDefault("loglevel", "info")
+	viper.SetDefault("loglevel", *loglevel)
+	viper.Set("port", port)
 
 	switch viper.Get("loglevel") {
 	case "debug":
@@ -28,8 +33,6 @@ func init() {
 	default:
 		log.SetLevel(log.WarnLevel)
 	}
-
-	dbFile = flag.String("db", "/tmp/comodoro.db", "Path to the BoltDB file")
 }
 
 func main() {
