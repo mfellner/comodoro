@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mfellner/comodoro/app"
@@ -42,11 +41,11 @@ func main() {
 
 	app := app.NewApp(&db)
 
-  port := viper.GetInt("port")
+	port := viper.GetInt("port")
 
 	log.WithFields(log.Fields{
 		"port": port,
 	}).Info("comodoro started")
 
-	log.Fatal(app.ListenAndServe(fmt.Sprintf(":%d", port)))
+	log.Fatal(app.ListenAndServe(port))
 }

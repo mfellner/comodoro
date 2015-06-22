@@ -8,6 +8,7 @@ import (
 	"github.com/mfellner/comodoro/db"
 )
 
+// Route represents a route for the HTTP handler.
 type Route struct {
 	Name        string
 	Method      string
@@ -15,6 +16,7 @@ type Route struct {
 	HandlerFunc http.HandlerFunc
 }
 
+// Routes is a collection of routes.
 type Routes []Route
 
 func routes(d *db.DB) Routes {

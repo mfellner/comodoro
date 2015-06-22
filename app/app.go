@@ -1,17 +1,20 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/mfellner/comodoro/db"
 )
 
+// App encapsulates the resources of the web service.
 type App struct {
 	db     *db.DB
 	router *mux.Router
 }
 
+// NewApp creates and configures a new application instance.
 func NewApp(d *db.DB) *App {
 
 	app := &App{
@@ -30,6 +33,7 @@ func NewApp(d *db.DB) *App {
 	return app
 }
 
-func (a *App) ListenAndServe(addr string) error {
-	return http.ListenAndServe(addr, a.router)
+// ListenAndServe starts the application on the given port.
+func (a *App) ListenAndServe(port int) error {
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), a.router)
 }

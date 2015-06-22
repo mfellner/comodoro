@@ -7,6 +7,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
+// DB encapsulates the database resources.
 type DB struct {
 	*bolt.DB
 }

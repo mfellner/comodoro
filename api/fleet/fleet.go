@@ -13,8 +13,9 @@ import (
 	"github.com/mfellner/comodoro/model"
 )
 
-var BUCKET_NAME_UNITS = []byte("units")
+var bucketName = []byte("units")
 
+// CreateUnit creates a new fleet unit.
 func CreateUnit(db *db.DB) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -32,7 +33,7 @@ func CreateUnit(db *db.DB) func(http.ResponseWriter, *http.Request) {
 		}
 
 		db.Update(func(tx *bolt.Tx) error {
-			b := tx.Bucket(BUCKET_NAME_UNITS)
+			b := tx.Bucket(bucketName)
 			v := b.Get([]byte(unit.Name))
 
 			if v != nil {
@@ -50,13 +51,14 @@ func CreateUnit(db *db.DB) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
+// GetUnits returns a collection of all fleet units.
 func GetUnits(db *db.DB) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		units := model.Units{}
 
 		db.View(func(tx *bolt.Tx) error {
-			b := tx.Bucket(BUCKET_NAME_UNITS)
+			b := tx.Bucket(bucketName)
 			b.ForEach(func(k, v []byte) error {
 				units = append(units, model.Unit{Name: string(k), Body: string(v)})
 				return nil
@@ -64,10 +66,11 @@ func GetUnits(db *db.DB) func(http.ResponseWriter, *http.Request) {
 			return nil
 		})
 
-		api.WriteResponse(w, units)
+		api.JSON(w, units)
 	}
 }
 
+// GetUnit returns a single fleet unit for the given name.
 func GetUnit(db *db.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -75,11 +78,11 @@ func GetUnit(db *db.DB) func(w http.ResponseWriter, r *http.Request) {
 		name := vars["name"]
 
 		db.View(func(tx *bolt.Tx) error {
-			b := tx.Bucket(BUCKET_NAME_UNITS)
+			b := tx.Bucket(bucketName)
 			v := b.Get([]byte(name))
 
 			if v != nil {
-				api.WriteResponse(w, model.Unit{Name: name, Body: string(v)})
+				api.JSON(w, model.Unit{Name: name, Body: string(v)})
 			} else {
 				api.NotFound(w)
 			}
