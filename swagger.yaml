@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
-  title: Comodoro API
-  description: Command fleets of containers with the Comodoro API
-  version: "0.1.0"
+  title: Uber API
+  description: Move your app forward with the Uber API
+  version: "1.0.0"
 host: localhost:8000
 schemes:
   - http
@@ -14,7 +14,7 @@ paths:
     get:
       summary: Fleet units
       description: |
-        A bunch of fleet units.
+        Get a collection of all fleet units.
       tags:
         - fleet
       responses:
@@ -24,13 +24,46 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Unit'
+    post:
+      summary: Fleet units
+      description: |
+        Submit a new fleet unit.
+      tags:
+        - fleet
+      parameters:
+        - name: unit
+          in: body
+          description: Unit to add to fleet
+          required: true
+          schema:
+            $ref: '#/definitions/Unit'
+      responses:
+        201:
+          description: The created unit
+          schema:
+            $ref: '#/definitions/Unit'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Duplicate unit
+          schema:
+            $ref: '#/definitions/Error'
+
 
 definitions:
   Unit:
+    type: object
     properties:
       name:
         type: string
         description: Fleet unit name.
       body:
-        type: string
+        type: object
         description: Fleet unit body.
+        additionalProperties:
+          type: string
+  Error:
+    type: string
+    description: Error message

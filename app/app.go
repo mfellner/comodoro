@@ -24,10 +24,10 @@ func NewApp(d *db.DB) *App {
 
 	for _, route := range routes(app.db) {
 		app.router.
-			Methods(route.Method).
+			Methods(route.Method, "OPTIONS").
 			Path(route.Pattern).
 			Name(route.Name).
-			Handler(AllowOrigin(route.Handler))
+			Handler(HandleCORS(AllowOrigin(route.Handler)))
 	}
 
 	return app

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func writeResponse(w http.ResponseWriter, i int, v interface{}) {
+func writeJSONResponse(w http.ResponseWriter, i int, v interface{}) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(i)
 	if err := json.NewEncoder(w).Encode(v); err != nil {
@@ -24,17 +24,18 @@ func Index() http.Handler {
 
 // JSON writes a code 200 JSON content response.
 func JSON(w http.ResponseWriter, v interface{}) {
-	writeResponse(w, http.StatusOK, v)
+	writeJSONResponse(w, http.StatusOK, v)
 }
 
 // Created writes a code 201 response for a created entity.
 func Created(w http.ResponseWriter, v interface{}) {
-	writeResponse(w, http.StatusCreated, v)
+	writeJSONResponse(w, http.StatusCreated, v)
 }
 
 // BadRequest writes a code 400 response for a client error.
-func BadRequest(w http.ResponseWriter, v interface{}) {
-	writeResponse(w, http.StatusBadRequest, v)
+func BadRequest(w http.ResponseWriter, s string) {
+	w.WriteHeader(http.StatusBadRequest)
+	fmt.Fprint(w, s)
 }
 
 // NotFound writes a code 404 response for a non-existing resource.
@@ -50,6 +51,7 @@ func DuplicateError(w http.ResponseWriter) {
 }
 
 // ServerError writes a code 500 response for a server-side error.
-func ServerError(w http.ResponseWriter, v interface{}) {
-	writeResponse(w, http.StatusInternalServerError, v)
+func ServerError(w http.ResponseWriter, s string) {
+	w.WriteHeader(http.StatusInternalServerError)
+	fmt.Fprint(w, s)
 }

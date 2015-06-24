@@ -29,7 +29,8 @@ func CreateUnit(db *db.DB) http.Handler {
 			panic(err)
 		}
 		if err := json.Unmarshal(body, &unit); err != nil {
-			api.BadRequest(w, err)
+			api.BadRequest(w, err.Error())
+			return
 		}
 
 		db.Update(func(tx *bolt.Tx) error {
@@ -41,8 +42,15 @@ func CreateUnit(db *db.DB) http.Handler {
 				return err
 			}
 
-			if err := b.Put([]byte(unit.Name), []byte(unit.Body)); err != nil {
-				api.ServerError(w, err)
+			jsonString, err := json.Marshal(unit.Body)
+
+			if err != nil {
+				api.BadRequest(w, err.Error())
+				return err
+			}
+
+			if err := b.Put([]byte(unit.Name), []byte(jsonString)); err != nil {
+				api.ServerError(w, err.Error())
 			} else {
 				api.Created(w, unit)
 			}
@@ -60,7 +68,14 @@ func GetUnits(db *db.DB) http.Handler {
 		db.View(func(tx *bolt.Tx) error {
 			b := tx.Bucket(bucketName)
 			b.ForEach(func(k, v []byte) error {
-				units = append(units, model.Unit{Name: string(k), Body: string(v)})
+
+				var body map[string]string
+
+				if err := json.Unmarshal(v, &body); err != nil {
+					api.ServerError(w, err.Error())
+				}
+
+				units = append(units, model.Unit{Name: string(k), Body: body})
 				return nil
 			})
 			return nil
@@ -81,12 +96,24 @@ func GetUnit(db *db.DB) http.Handler {
 			b := tx.Bucket(bucketName)
 			v := b.Get([]byte(name))
 
-			if v != nil {
-				api.JSON(w, model.Unit{Name: name, Body: string(v)})
-			} else {
+			if v == nil {
 				api.NotFound(w)
+				return nil
 			}
+
+			if body, err := unmarshal(v); err != nil {
+				api.ServerError(w, err.Error())
+			} else {
+				api.JSON(w, model.Unit{Name: name, Body: body})
+			}
+
 			return nil
 		})
 	})
+}
+
+func unmarshal(v []byte) (map[string]string, error) {
+	var body map[string]string
+	err := json.Unmarshal(v, &body)
+	return body, err
 }
