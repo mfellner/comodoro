@@ -112,6 +112,32 @@ func GetUnit(db *db.DB) http.Handler {
 	})
 }
 
+// DeleteUnit deletes the fleet unit with the given name.
+func DeleteUnit(db *db.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		vars := mux.Vars(r)
+		name := vars["name"]
+
+		db.Update(func(tx *bolt.Tx) error {
+			b := tx.Bucket(bucketName)
+			v := b.Get([]byte(name))
+
+			if v == nil {
+				api.NotFound(w)
+				return nil
+			}
+
+			if err := b.Delete([]byte(name)); err != nil {
+				api.ServerError(w, err.Error())
+				return err
+			}
+			api.Deleted(w)
+			return nil
+		})
+	})
+}
+
 func unmarshal(v []byte) (map[string]string, error) {
 	var body map[string]string
 	err := json.Unmarshal(v, &body)

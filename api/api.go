@@ -32,6 +32,11 @@ func Created(w http.ResponseWriter, v interface{}) {
 	writeJSONResponse(w, http.StatusCreated, v)
 }
 
+// Deleted writes a code 204 response for a deleted entity.
+func Deleted(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNoContent)
+}
+
 // BadRequest writes a code 400 response for a client error.
 func BadRequest(w http.ResponseWriter, s string) {
 	w.WriteHeader(http.StatusBadRequest)

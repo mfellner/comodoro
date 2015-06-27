@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
-  title: Uber API
-  description: Move your app forward with the Uber API
-  version: "1.0.0"
+  title: Comodoro API
+  description: Command fleets of containers.
+  version: "0.1.0"
 host: localhost:8000
 schemes:
   - http
@@ -11,23 +11,9 @@ produces:
   - application/json
 paths:
   /fleet/units:
-    get:
-      summary: Fleet units
-      description: |
-        Get a collection of all fleet units.
-      tags:
-        - fleet
-      responses:
-        200:
-          description: An array of fleet units
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Unit'
     post:
       summary: Fleet units
-      description: |
-        Submit a new fleet unit.
+      description: Submit a new fleet unit.
       tags:
         - fleet
       parameters:
@@ -50,7 +36,69 @@ paths:
           description: Duplicate unit
           schema:
             $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Fleet units
+      description: |
+        Get a collection of all fleet units.
+      tags:
+        - fleet
+      responses:
+        200:
+          description: An array of fleet units
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Unit'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
+  /fleet/units/{name}:
+    get:
+      description: Get a fleet unit by ID.
+      parameters:
+        - name: name
+          in: path
+          description: Name of unit to fetch
+          required: true
+          type: string
+      responses:
+        200:
+          description: Fleet unit
+          schema:
+            $ref: '#/definitions/Unit'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Delete a fleet unit by name.
+      parameters:
+        - name: name
+          in: path
+          description: Name of unit to delete
+          required: true
+          type: string
+      responses:
+        204:
+          description: Successfully deleted
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
 definitions:
   Unit:

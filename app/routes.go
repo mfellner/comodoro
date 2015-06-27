@@ -45,5 +45,11 @@ func routes(d *db.DB) Routes {
 			"/api/fleet/units/{name}",
 			fleet.GetUnit(d),
 		},
+		Route{
+			"GetFleetUnit",
+			"DELETE",
+			"/api/fleet/units/{name}",
+			fleet.DeleteUnit(d),
+		},
 	}
 }
