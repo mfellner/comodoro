@@ -33,6 +33,16 @@ func NewApp(d *db.DB) *App {
 	return app
 }
 
+// DB is the application's database.
+func (a *App) DB() *db.DB {
+	return a.db
+}
+
+// Router is the application's router.
+func (a *App) Router() *mux.Router {
+	return a.router
+}
+
 // ListenAndServe starts the application on the given port.
 func (a *App) ListenAndServe(port int) error {
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), a.router)

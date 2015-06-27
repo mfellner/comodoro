@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/boltdb/bolt"
@@ -69,7 +70,7 @@ func GetUnits(db *db.DB) http.Handler {
 			b := tx.Bucket(bucketName)
 			b.ForEach(func(k, v []byte) error {
 
-				var body map[string]string
+				var body map[string]interface{}
 
 				if err := json.Unmarshal(v, &body); err != nil {
 					api.ServerError(w, err.Error())
@@ -91,6 +92,8 @@ func GetUnit(db *db.DB) http.Handler {
 
 		vars := mux.Vars(r)
 		name := vars["name"]
+
+		log.Print(vars)
 
 		db.View(func(tx *bolt.Tx) error {
 			b := tx.Bucket(bucketName)
@@ -138,8 +141,8 @@ func DeleteUnit(db *db.DB) http.Handler {
 	})
 }
 
-func unmarshal(v []byte) (map[string]string, error) {
-	var body map[string]string
+func unmarshal(v []byte) (map[string]interface{}, error) {
+	var body map[string]interface{}
 	err := json.Unmarshal(v, &body)
 	return body, err
 }
