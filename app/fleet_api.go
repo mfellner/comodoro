@@ -1,23 +1,21 @@
-package fleet
+package app
 
 import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/boltdb/bolt"
 	"github.com/gorilla/mux"
 	"github.com/mfellner/comodoro/api"
-	"github.com/mfellner/comodoro/db"
 	"github.com/mfellner/comodoro/model"
 )
 
 var bucketName = []byte("units")
 
 // CreateUnit creates a new fleet unit.
-func CreateUnit(db *db.DB) http.Handler {
+func CreateUnit(app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		var unit model.Unit
@@ -34,7 +32,7 @@ func CreateUnit(db *db.DB) http.Handler {
 			return
 		}
 
-		db.Update(func(tx *bolt.Tx) error {
+		app.DB().Update(func(tx *bolt.Tx) error {
 			b := tx.Bucket(bucketName)
 			v := b.Get([]byte(unit.Name))
 
@@ -61,12 +59,12 @@ func CreateUnit(db *db.DB) http.Handler {
 }
 
 // GetUnits returns a collection of all fleet units.
-func GetUnits(db *db.DB) http.Handler {
+func GetUnits(app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		units := model.Units{}
 
-		db.View(func(tx *bolt.Tx) error {
+		app.DB().View(func(tx *bolt.Tx) error {
 			b := tx.Bucket(bucketName)
 			b.ForEach(func(k, v []byte) error {
 
@@ -87,15 +85,13 @@ func GetUnits(db *db.DB) http.Handler {
 }
 
 // GetUnit returns a single fleet unit for the given name.
-func GetUnit(db *db.DB) http.Handler {
+func GetUnit(app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
 		name := vars["name"]
 
-		log.Print(vars)
-
-		db.View(func(tx *bolt.Tx) error {
+		app.DB().View(func(tx *bolt.Tx) error {
 			b := tx.Bucket(bucketName)
 			v := b.Get([]byte(name))
 
@@ -116,13 +112,13 @@ func GetUnit(db *db.DB) http.Handler {
 }
 
 // DeleteUnit deletes the fleet unit with the given name.
-func DeleteUnit(db *db.DB) http.Handler {
+func DeleteUnit(app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
 		name := vars["name"]
 
-		db.Update(func(tx *bolt.Tx) error {
+		app.DB().Update(func(tx *bolt.Tx) error {
 			b := tx.Bucket(bucketName)
 			v := b.Get([]byte(name))
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mfellner/comodoro/app"
@@ -9,21 +10,37 @@ import (
 	"github.com/spf13/viper"
 )
 
-var dbFile *string
+var (
+	dbFile        *string
+	globalFlagset = flag.NewFlagSet("comodoro", flag.ExitOnError)
+
+	globalFlags = struct {
+		Port          int
+		LogLevel      string
+		DBFile        string
+		FleetEndpoint string
+	}{}
+)
 
 func init() {
-	port := flag.Int("port", 8080, "Port to listen on")
-	loglevel := flag.String("log", "info", "Loglevel (debug|info)")
-	dbFile = flag.String("db", "/tmp/comodoro.db", "Path to the BoltDB file")
-	flag.Parse()
+	globalFlagset.IntVar(&globalFlags.Port,
+		"port", 8080, "Port to listen on.")
+	globalFlagset.StringVar(&globalFlags.LogLevel,
+		"log", "info", "Log level (\"debug\" or \"info\").")
+	globalFlagset.StringVar(&globalFlags.DBFile,
+		"db", "/tmp/comodoro.db", "Path to the BoltDB file.")
+	globalFlagset.StringVar(&globalFlags.FleetEndpoint,
+		"fleet-endpoint", "unix:///var/run/fleet.sock", "Location of the fleet API.")
+	globalFlagset.Parse(os.Args[1:])
 
+	// Enviroment variables are uppercase and must start with APP_
 	viper.SetEnvPrefix("app")
-
 	viper.BindEnv("port")
 	viper.BindEnv("loglevel")
 
-	viper.SetDefault("loglevel", *loglevel)
-	viper.Set("port", port)
+	viper.SetDefault("port", globalFlags.Port)
+	viper.SetDefault("loglevel", globalFlags.LogLevel)
+	viper.SetDefault("fleetEndpoint", globalFlags.FleetEndpoint)
 
 	switch viper.Get("loglevel") {
 	case "debug":
@@ -37,7 +54,7 @@ func init() {
 
 func main() {
 	var db db.DB
-	if err := db.Open(*dbFile, 0600); err != nil {
+	if err := db.Open(globalFlags.DBFile, 0600); err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
@@ -48,7 +65,7 @@ func main() {
 
 	log.WithFields(log.Fields{
 		"port": port,
-	}).Info("comodoro started")
+	}).Info("Comodoro started")
 
 	log.Fatal(app.ListenAndServe(port))
 }

@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/mfellner/comodoro/api"
-	"github.com/mfellner/comodoro/api/fleet"
-	"github.com/mfellner/comodoro/db"
 )
 
 // Route represents a route for the HTTP handler.
@@ -19,7 +17,7 @@ type Route struct {
 // Routes is a collection of routes.
 type Routes []Route
 
-func routes(d *db.DB) Routes {
+func routes(app *App) Routes {
 	return Routes{
 		Route{
 			"Index",
@@ -31,25 +29,25 @@ func routes(d *db.DB) Routes {
 			"CreateFleetUnit",
 			"POST",
 			"/api/fleet/units",
-			fleet.CreateUnit(d),
+			CreateUnit(app),
 		},
 		Route{
 			"GetFleetUnits",
 			"GET",
 			"/api/fleet/units",
-			fleet.GetUnits(d),
+			GetUnits(app),
 		},
 		Route{
 			"GetFleetUnit",
 			"GET",
 			"/api/fleet/units/{name}",
-			fleet.GetUnit(d),
+			GetUnit(app),
 		},
 		Route{
 			"GetFleetUnit",
 			"DELETE",
 			"/api/fleet/units/{name}",
-			fleet.DeleteUnit(d),
+			DeleteUnit(app),
 		},
 	}
 }

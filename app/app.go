@@ -6,23 +6,27 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/mfellner/comodoro/db"
+	"github.com/spf13/viper"
 )
 
 // App encapsulates the resources of the web service.
 type App struct {
-	db     *db.DB
-	router *mux.Router
+	db          *db.DB
+	router      *mux.Router
+	fleetClient *FleetClient
 }
 
 // NewApp creates and configures a new application instance.
 func NewApp(d *db.DB) *App {
+	fleetEndpoint := viper.GetString("fleetEndpoint")
 
 	app := &App{
-		db:     d,
-		router: mux.NewRouter().StrictSlash(true),
+		db:          d,
+		router:      mux.NewRouter().StrictSlash(true),
+		fleetClient: NewFleetClient(fleetEndpoint),
 	}
 
-	for _, route := range routes(app.db) {
+	for _, route := range routes(app) {
 		app.router.
 			Methods(route.Method, "OPTIONS").
 			Path(route.Pattern).

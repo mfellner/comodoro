@@ -12,6 +12,7 @@ import (
 
 	"github.com/mfellner/comodoro/db"
 	"github.com/smartystreets/goconvey/convey"
+	"github.com/spf13/viper"
 )
 
 func withApp(fn func(*App)) func() {
@@ -27,10 +28,24 @@ func withApp(fn func(*App)) func() {
 	}
 }
 
+func withFleetMock(fn func()) func() {
+	return func() {
+		handler := func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "text/plain")
+			fmt.Fprint(w, "foobar")
+		}
+		server := httptest.NewServer(http.HandlerFunc(handler))
+		defer server.Close()
+
+		viper.SetDefault("fleetEndpoint", server.URL)
+		fn()
+	}
+}
+
 // TestApp tests the application.
 func TestApp(t *testing.T) {
 
-	convey.Convey("Given a fleet unit JSON", t, withApp(func(app *App) {
+	convey.Convey("Given a fleet unit JSON", t, withFleetMock(withApp(func(app *App) {
 
 		router := app.Router()
 
@@ -88,7 +103,7 @@ func TestApp(t *testing.T) {
 			})
 		})
 
-	}))
+	})))
 
 	convey.Convey("Given the Comodoro App", t, withApp(func(app *App) {
 

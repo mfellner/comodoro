@@ -49,7 +49,6 @@ func TestApi(t *testing.T) {
 			callJSON := func() {
 				w := httptest.NewRecorder()
 				JSON(w, func() {})
-				log.Print(w.Body)
 			}
 			convey.Convey("Then then it should panic", func() {
 				convey.So(callJSON, convey.ShouldPanic)
