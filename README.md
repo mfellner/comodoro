@@ -1,4 +1,4 @@
-# Comodoro
+# Comodoro [![Travis](https://img.shields.io/travis/mfellner/comodoro.svg?style=flat-square)](https://travis-ci.org/mfellner/comodoro)
 
 *Work in progress*
 
@@ -14,7 +14,7 @@
 
 **With Go test:**
 
-    got test test/*
+    got test ./...
 
 **With [GoConvey](http://goconvey.co/)**:
 
