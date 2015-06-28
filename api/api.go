@@ -14,6 +14,12 @@ func writeJSONResponse(w http.ResponseWriter, i int, v interface{}) {
 	}
 }
 
+func writeTextResponse(w http.ResponseWriter, i int, s string) {
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(i)
+	fmt.Fprint(w, s)
+}
+
 // Index writes a response for the root of the API.
 func Index() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -39,24 +45,20 @@ func Deleted(w http.ResponseWriter) {
 
 // BadRequest writes a code 400 response for a client error.
 func BadRequest(w http.ResponseWriter, s string) {
-	w.WriteHeader(http.StatusBadRequest)
-	fmt.Fprint(w, s)
+	writeTextResponse(w, http.StatusBadRequest, s)
 }
 
 // NotFound writes a code 404 response for a non-existing resource.
 func NotFound(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprint(w, "Not Found")
+	writeTextResponse(w, http.StatusNotFound, "Not Found")
 }
 
 //DuplicateError writes a code 409 response for conflict error.
 func DuplicateError(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusConflict)
-	fmt.Fprint(w, "Duplicate Entry")
+	writeTextResponse(w, http.StatusConflict, "Duplicate Entry")
 }
 
 // ServerError writes a code 500 response for a server-side error.
 func ServerError(w http.ResponseWriter, s string) {
-	w.WriteHeader(http.StatusInternalServerError)
-	fmt.Fprint(w, s)
+	writeTextResponse(w, http.StatusInternalServerError, s)
 }
