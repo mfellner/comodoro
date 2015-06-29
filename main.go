@@ -24,9 +24,9 @@ var (
 
 func init() {
 	globalFlagset.IntVar(&globalFlags.Port,
-		"port", 8080, "Port to listen on.")
+		"port", 3030, "Port to listen on.")
 	globalFlagset.StringVar(&globalFlags.LogLevel,
-		"log", "info", "Log level (\"debug\" or \"info\").")
+		"log", "info", "Log level (\"debug\", \"info\" or \"warn\").")
 	globalFlagset.StringVar(&globalFlags.DBFile,
 		"db", "/tmp/comodoro.db", "Path to the BoltDB file.")
 	globalFlagset.StringVar(&globalFlags.FleetEndpoint,
@@ -37,6 +37,7 @@ func init() {
 	viper.SetEnvPrefix("app")
 	viper.BindEnv("port")
 	viper.BindEnv("loglevel")
+	viper.BindEnv("fleetEndpoint")
 
 	viper.SetDefault("port", globalFlags.Port)
 	viper.SetDefault("loglevel", globalFlags.LogLevel)
