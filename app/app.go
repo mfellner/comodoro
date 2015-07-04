@@ -5,19 +5,19 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/mfellner/comodoro/db"
+	"github.com/mfellner/comodoro/middleware"
 	"github.com/spf13/viper"
 )
 
 // App encapsulates the resources of the web service.
 type App struct {
-	db          *db.DB
+	db          *DB
 	router      *mux.Router
 	fleetClient *FleetClient
 }
 
 // NewApp creates and configures a new application instance.
-func NewApp(d *db.DB) *App {
+func NewApp(d *DB) *App {
 	fleetEndpoint := viper.GetString("fleetEndpoint")
 
 	app := &App{
@@ -31,14 +31,18 @@ func NewApp(d *db.DB) *App {
 			Methods(route.Method, "OPTIONS").
 			Path(route.Pattern).
 			Name(route.Name).
-			Handler(HandleCORS(AllowOrigin(route.Handler)))
+			Handler(middleware.New(
+			middleware.HandleCORS,
+			middleware.AllowOrigin,
+			middleware.LogHTTP).
+			Then(route.Handler))
 	}
 
 	return app
 }
 
 // DB is the application's database.
-func (a *App) DB() *db.DB {
+func (a *App) DB() *DB {
 	return a.db
 }
 

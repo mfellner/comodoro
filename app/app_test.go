@@ -10,14 +10,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/mfellner/comodoro/db"
 	"github.com/smartystreets/goconvey/convey"
 	"github.com/spf13/viper"
 )
 
 func withApp(fn func(*App)) func() {
 	return func() {
-		var db db.DB
+		var db DB
 		if err := db.Open("/tmp/comodoro.db", 0600); err != nil {
 			log.Fatal(err)
 		}

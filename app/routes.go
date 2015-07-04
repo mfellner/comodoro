@@ -3,7 +3,7 @@ package app
 import (
 	"net/http"
 
-	"github.com/mfellner/comodoro/api"
+	"github.com/mfellner/comodoro/rest"
 )
 
 // Route represents a route for the HTTP handler.
@@ -23,7 +23,7 @@ func routes(app *App) Routes {
 			"Index",
 			"GET",
 			"/",
-			api.Index(),
+			rest.Index(),
 		},
 		Route{
 			"CreateFleetUnit",

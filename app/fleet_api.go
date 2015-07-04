@@ -8,8 +8,8 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/gorilla/mux"
-	"github.com/mfellner/comodoro/api"
 	"github.com/mfellner/comodoro/model"
+	"github.com/mfellner/comodoro/rest"
 )
 
 var bucketName = []byte("units")
@@ -28,7 +28,7 @@ func CreateUnit(app *App) http.Handler {
 			panic(err)
 		}
 		if err := json.Unmarshal(body, &unit); err != nil {
-			api.BadRequest(w, err.Error())
+			rest.BadRequest(w, err.Error())
 			return
 		}
 
@@ -37,21 +37,21 @@ func CreateUnit(app *App) http.Handler {
 			v := b.Get([]byte(unit.Name))
 
 			if v != nil {
-				api.DuplicateError(w)
+				rest.DuplicateError(w)
 				return err
 			}
 
 			jsonString, err := json.Marshal(unit.Body)
 
 			if err != nil {
-				api.BadRequest(w, err.Error())
+				rest.BadRequest(w, err.Error())
 				return err
 			}
 
 			if err := b.Put([]byte(unit.Name), []byte(jsonString)); err != nil {
-				api.ServerError(w, err.Error())
+				rest.ServerError(w, err.Error())
 			} else {
-				api.Created(w, unit)
+				rest.Created(w, unit)
 			}
 			return err
 		})
@@ -71,7 +71,7 @@ func GetUnits(app *App) http.Handler {
 				var body map[string]interface{}
 
 				if err := json.Unmarshal(v, &body); err != nil {
-					api.ServerError(w, err.Error())
+					rest.ServerError(w, err.Error())
 				}
 
 				units = append(units, model.Unit{Name: string(k), Body: body})
@@ -80,7 +80,7 @@ func GetUnits(app *App) http.Handler {
 			return nil
 		})
 
-		api.JSON(w, units)
+		rest.JSON(w, units)
 	})
 }
 
@@ -96,14 +96,14 @@ func GetUnit(app *App) http.Handler {
 			v := b.Get([]byte(name))
 
 			if v == nil {
-				api.NotFound(w)
+				rest.NotFound(w)
 				return nil
 			}
 
 			if body, err := unmarshal(v); err != nil {
-				api.ServerError(w, err.Error())
+				rest.ServerError(w, err.Error())
 			} else {
-				api.JSON(w, model.Unit{Name: name, Body: body})
+				rest.JSON(w, model.Unit{Name: name, Body: body})
 			}
 
 			return nil
@@ -123,15 +123,15 @@ func DeleteUnit(app *App) http.Handler {
 			v := b.Get([]byte(name))
 
 			if v == nil {
-				api.NotFound(w)
+				rest.NotFound(w)
 				return nil
 			}
 
 			if err := b.Delete([]byte(name)); err != nil {
-				api.ServerError(w, err.Error())
+				rest.ServerError(w, err.Error())
 				return err
 			}
-			api.Deleted(w)
+			rest.Deleted(w)
 			return nil
 		})
 	})

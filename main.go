@@ -6,7 +6,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mfellner/comodoro/app"
-	"github.com/mfellner/comodoro/db"
 	"github.com/spf13/viper"
 )
 
@@ -54,7 +53,7 @@ func init() {
 }
 
 func main() {
-	var db db.DB
+	var db app.DB
 	if err := db.Open(globalFlags.DBFile, 0600); err != nil {
 		log.Fatal(err)
 	}
