@@ -1,4 +1,4 @@
-# Comodoro [![Docker Pulls](https://img.shields.io/docker/pulls/mfellner/comodoro.svg)](https://registry.hub.docker.com/u/mfellner/comodoro) [![Travis](https://img.shields.io/travis/mfellner/comodoro.svg?style=flat-square)](https://travis-ci.org/mfellner/comodoro)
+# Comodoro [![Docker Pulls](https://img.shields.io/docker/pulls/mfellner/comodoro.svg)](https://registry.hub.docker.com/u/mfellner/comodoro) [![Travis](https://img.shields.io/travis/mfellner/comodoro.svg?style=flat-square)](https://travis-ci.org/mfellner/comodoro) [![Coveralls](https://img.shields.io/coveralls/mfellner/comodoro.svg?style=flat-square)](https://coveralls.io/r/mfellner/comodoro)
 
 *Work in progress*
 
