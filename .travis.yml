@@ -12,7 +12,7 @@ script:
     - go test -coverprofile=middleware.coverprofile ./middleware
     - go test -coverprofile=rest.coverprofile ./rest
     - $HOME/gopath/bin/gover
-    - "$HOME/gopath/bin/goveralls
-      -service travis-ci
-      -coverprofile=gover.coverprofile
-      -repotoken i5Fg4YBf3f4sLVIBagb7MjvII117mtz1f"
+    # - "$HOME/gopath/bin/goveralls
+    #   -service=travis-ci
+    #   -coverprofile=gover.coverprofile
+    #   -repotoken=$COVERALLS_TOKEN"
