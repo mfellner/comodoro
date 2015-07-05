@@ -48,8 +48,10 @@ func TestApp(t *testing.T) {
 
 		router := app.Router()
 
+		unitName := "test-unit"
+
 		unit := map[string]interface{}{
-			"name": "test-unit",
+			"name": unitName,
 			"body": map[string]interface{}{
 				"foo": "bar",
 			},
@@ -61,9 +63,7 @@ func TestApp(t *testing.T) {
 		}
 
 		convey.Convey("When the unit is first submitted", func() {
-			req := newPOSTRequest("/api/fleet/units", jsonString)
-			w := httptest.NewRecorder()
-
+			w, req := newPOSTRequest("/api/fleet/units", jsonString)
 			router.ServeHTTP(w, req)
 
 			convey.Convey("Then the response should be status Created", func() {
@@ -71,30 +71,56 @@ func TestApp(t *testing.T) {
 			})
 
 			convey.Convey("And when it is fetched again", func() {
-				req := newGETRequest(fmt.Sprintf("/api/fleet/units/%s", "test-unit"))
-				w := httptest.NewRecorder()
-
+				w, req := newGETRequest(fmt.Sprintf("/api/fleet/units/%s", unitName))
 				router.ServeHTTP(w, req)
 
-				convey.Convey("Then the response should be status OK", func() {
+				convey.Convey("Then the response should be that unit", func() {
+					actualObj := unmarshalBuffer(w.Body)
 					convey.So(w.Code, convey.ShouldEqual, 200)
+					convey.So(actualObj, convey.ShouldResemble, unit)
+				})
+			})
+
+			convey.Convey("And when the list of all units is fetched", func() {
+				w, req := newGETRequest("/api/fleet/units")
+				router.ServeHTTP(w, req)
+
+				convey.Convey("Then the response should be a list that contains the unit", func() {
+					actualObj := unmarshalBuffer(w.Body)
+					expectedObj := []interface{}{unit}
+					convey.So(w.Code, convey.ShouldEqual, 200)
+					convey.So(actualObj, convey.ShouldResemble, expectedObj)
+				})
+			})
+
+			convey.Convey("And when it is deleted", func() {
+				w, req := newDELETERequest(fmt.Sprintf("/api/fleet/units/%s", unitName))
+				router.ServeHTTP(w, req)
+
+				convey.Convey("Then the response should be status 204 No Content", func() {
+					convey.So(w.Code, convey.ShouldEqual, 204)
+				})
+
+				convey.Convey("And when it is fetched again", func() {
+					w, req := newGETRequest(fmt.Sprintf("/api/fleet/units/%s", unitName))
+					router.ServeHTTP(w, req)
+
+					convey.Convey("Then the response should be status 404 Not Found", func() {
+						convey.So(w.Code, convey.ShouldEqual, 404)
+					})
 				})
 			})
 		})
 
 		convey.Convey("When the same unit is submitted twice", func() {
-			req := newPOSTRequest("/api/fleet/units", jsonString)
-			w := httptest.NewRecorder()
-
+			w, req := newPOSTRequest("/api/fleet/units", jsonString)
 			router.ServeHTTP(w, req)
 
 			convey.Convey("The API should return status Created on the first request", func() {
 				convey.So(w.Code, convey.ShouldEqual, 201)
 			})
 
-			req = newPOSTRequest("/api/fleet/units", jsonString)
-			w = httptest.NewRecorder()
-
+			w, req = newPOSTRequest("/api/fleet/units", jsonString)
 			router.ServeHTTP(w, req)
 
 			convey.Convey("The API should return error Duplicate Entry on the second request", func() {
@@ -107,8 +133,7 @@ func TestApp(t *testing.T) {
 	convey.Convey("Given the Comodoro App", t, withApp(func(app *App) {
 
 		convey.Convey("When a non-existing unit is requested", func() {
-			req := newGETRequest("/api/fleet/units/foobar")
-			w := httptest.NewRecorder()
+			w, req := newGETRequest("/api/fleet/units/foobar")
 			app.Router().ServeHTTP(w, req)
 
 			convey.Convey("Then it should return error Not Found", func() {
@@ -117,9 +142,8 @@ func TestApp(t *testing.T) {
 		})
 
 		convey.Convey("When I send an OPTIONS request", func() {
-			req := newOPTIONSRequest("/api/fleet/units")
+			w, req := newOPTIONSRequest("/api/fleet/units")
 			req.Header.Add("Origin", "http://localhost")
-			w := httptest.NewRecorder()
 			app.Router().ServeHTTP(w, req)
 
 			convey.Convey("Then it should return status OK", func() {
@@ -133,26 +157,34 @@ func TestApp(t *testing.T) {
 	}))
 }
 
-func newPOSTRequest(url string, json []byte) *http.Request {
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(json))
-	if err != nil {
+func unmarshalBuffer(b *bytes.Buffer) interface{} {
+	var obj interface{}
+	if err := json.Unmarshal(b.Bytes(), &obj); err != nil {
 		log.Fatal(err)
 	}
-	return req
+	return obj
 }
 
-func newGETRequest(url string) *http.Request {
-	req, err := http.NewRequest("GET", url, nil)
+func newRequest(method string, url string, json []byte) (*httptest.ResponseRecorder, *http.Request) {
+	req, err := http.NewRequest(method, url, bytes.NewBuffer(json))
 	if err != nil {
 		log.Fatal(err)
 	}
-	return req
+	return httptest.NewRecorder(), req
 }
 
-func newOPTIONSRequest(url string) *http.Request {
-	req, err := http.NewRequest("OPTIONS", url, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return req
+func newPOSTRequest(url string, json []byte) (*httptest.ResponseRecorder, *http.Request) {
+	return newRequest("POST", url, json)
+}
+
+func newGETRequest(url string) (*httptest.ResponseRecorder, *http.Request) {
+	return newRequest("GET", url, nil)
+}
+
+func newDELETERequest(url string) (*httptest.ResponseRecorder, *http.Request) {
+	return newRequest("DELETE", url, nil)
+}
+
+func newOPTIONSRequest(url string) (*httptest.ResponseRecorder, *http.Request) {
+	return newRequest("OPTIONS", url, nil)
 }
