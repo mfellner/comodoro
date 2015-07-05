@@ -49,5 +49,11 @@ func routes(app *App) Routes {
 			"/api/fleet/units/{name}",
 			DeleteUnit(app),
 		},
+		Route{
+			"GetInfo",
+			"GET",
+			"/api/info",
+			GetInfo(app),
+		},
 	}
 }

@@ -136,6 +136,17 @@ func DeleteUnit(app *App) http.Handler {
 	})
 }
 
+// GetInfo returns some status information.
+func GetInfo(app *App) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if info, err := app.fleetClient.ListMachines(); err != nil {
+			rest.ServerError(w, err.Error())
+		} else {
+			rest.JSON(w, info)
+		}
+	})
+}
+
 func unmarshal(v []byte) (map[string]interface{}, error) {
 	var body map[string]interface{}
 	err := json.Unmarshal(v, &body)

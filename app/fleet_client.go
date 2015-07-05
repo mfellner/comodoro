@@ -27,6 +27,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/coreos/fleet/client"
 	"github.com/coreos/fleet/job"
+	"github.com/coreos/fleet/machine"
 	"github.com/coreos/fleet/pkg"
 	"github.com/coreos/fleet/schema"
 	"github.com/coreos/fleet/unit"
@@ -134,4 +135,9 @@ func (fc *FleetClient) CreateUnit(name string, uf *unit.UnitFile) (*schema.Unit,
 
 	log.Debug("Created Unit(%s) in Registry", name)
 	return &u, nil
+}
+
+// ListMachines lists the active CoreOS nodes in the fleet.
+func (fc *FleetClient) ListMachines() ([]machine.MachineState, error) {
+	return fc.api.Machines()
 }
