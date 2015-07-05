@@ -1,9 +1,9 @@
 FROM golang:1.4
 
-RUN mkdir -p /go/src/app
-WORKDIR /go/src/app
+RUN mkdir -p /go/src/github.com/mfellner/comodoro
+WORKDIR /go/src/github.com/mfellner/comodoro
 
-COPY . /go/src/app
+COPY . /go/src/github.com/mfellner/comodoro
 RUN go-wrapper download
 RUN go-wrapper install
 
