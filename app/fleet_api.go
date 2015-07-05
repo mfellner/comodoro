@@ -8,7 +8,6 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/gorilla/mux"
-	"github.com/mfellner/comodoro/model"
 	"github.com/mfellner/comodoro/rest"
 )
 
@@ -18,7 +17,7 @@ var bucketName = []byte("units")
 func CreateUnit(app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		var unit model.Unit
+		var unit FleetUnit
 		body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 
 		if err != nil {
@@ -62,7 +61,7 @@ func CreateUnit(app *App) http.Handler {
 func GetUnits(app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		units := model.Units{}
+		units := FleetUnits{}
 
 		app.DB().View(func(tx *bolt.Tx) error {
 			b := tx.Bucket(bucketName)
@@ -74,7 +73,7 @@ func GetUnits(app *App) http.Handler {
 					rest.ServerError(w, err.Error())
 				}
 
-				units = append(units, model.Unit{Name: string(k), Body: body})
+				units = append(units, FleetUnit{Name: string(k), Body: body})
 				return nil
 			})
 			return nil
@@ -103,7 +102,7 @@ func GetUnit(app *App) http.Handler {
 			if body, err := unmarshal(v); err != nil {
 				rest.ServerError(w, err.Error())
 			} else {
-				rest.JSON(w, model.Unit{Name: name, Body: body})
+				rest.JSON(w, FleetUnit{Name: name, Body: body})
 			}
 
 			return nil

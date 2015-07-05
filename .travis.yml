@@ -10,9 +10,7 @@ before_install:
 script:
     - go test -coverprofile=app.coverprofile ./app
     - go test -coverprofile=middleware.coverprofile ./middleware
-    - go test -coverprofile=model.coverprofile ./model
     - go test -coverprofile=rest.coverprofile ./rest
-    - go test -coverprofile=main.coverprofile
     - $HOME/gopath/bin/gover
     - "$HOME/gopath/bin/goveralls
       -service travis-ci
